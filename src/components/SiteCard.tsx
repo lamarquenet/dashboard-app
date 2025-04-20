@@ -59,7 +59,7 @@ const SiteCard: React.FC<SiteCardProps> = ({ site, onEdit, onDelete }) => {
   const imageContainerStyles = {
     position: 'relative' as const,
     width: '100%',
-    height: '8rem', // Reduced height for more square-like appearance
+    height: '6rem', // Reduced height for more square-like appearance
     aspectRatio: '4/3', // Maintain a consistent aspect ratio
   };
 
@@ -71,8 +71,8 @@ const SiteCard: React.FC<SiteCardProps> = ({ site, onEdit, onDelete }) => {
 
   // Content container styles
   const contentContainerStyles = {
-    padding: '0.75rem', // p-3 (reduced padding)
-    height: '5rem', // Fixed height for consistent card sizes
+    padding: '0 0.75rem 0.75rem 0.75rem', // Removed top padding
+    height: '6rem', // Fixed height for consistent card sizes
     overflow: 'hidden',
   };
 
@@ -89,7 +89,7 @@ const SiteCard: React.FC<SiteCardProps> = ({ site, onEdit, onDelete }) => {
 
   // Description styles
   const descriptionStyles = {
-    fontSize: '0.75rem', // text-xs (reduced from text-sm)
+    fontSize: '0.60rem', // text-xs (reduced from text-sm)
     color: theme === 'light' ? '#4b5563' : '#9ca3af', // text-gray-600 : dark:text-gray-400
     display: '-webkit-box' as any,
     WebkitLineClamp: 2, // line-clamp-2
