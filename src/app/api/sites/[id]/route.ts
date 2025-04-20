@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllSites, saveAllSites } from '@/lib/data-access/sites';
 import { Site } from '@/types';
+import { writeFile, mkdir } from 'fs/promises'; // Import fs/promises for async file operations
+import path from 'path'; // Import path for handling file paths
 
 // PUT /api/sites/[id]
-export async function PUT(request: NextRequest, { params } : { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) { // params is not a Promise here
+  const { id } = params; // Directly access id
 
   if (!id) {
     return NextResponse.json({ message: 'Site ID is required for update' }, { status: 400 });
   }
 
   try {
-    const body = await request.json();
+    const formData = await request.formData();
+    const name = formData.get('name') as string | null;
+    const link = formData.get('link') as string | null;
+    const description = formData.get('description') as string | null;
+    const thumbnailFile = formData.get('thumbnail') as File | null;
 
-    // Basic validation
-    if (!body.name || !body.link || !body.description) {
+    // Basic validation for text fields
+    if (!name || !link || !description) {
       return NextResponse.json({ message: 'Missing required fields: name, link, description' }, { status: 400 });
     }
 
@@ -25,12 +31,46 @@ export async function PUT(request: NextRequest, { params } : { params: Promise<{
       return NextResponse.json({ message: `Site with ID ${id} not found` }, { status: 404 });
     }
 
+    const existingSite = sites[siteIndex];
+    let thumbnailUrl = existingSite.thumbnailUrl; // Default to existing URL
+
+    if (thumbnailFile) {
+      // Define the target directory
+      const uploadDir = path.join(process.cwd(), 'public', 'images');
+      // Ensure the directory exists
+      await mkdir(uploadDir, { recursive: true });
+
+      // Generate a unique filename
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+      const extension = path.extname(thumbnailFile.name);
+      const filename = `${thumbnailFile.name.replace(extension, '')}-${uniqueSuffix}${extension}`;
+      const filePath = path.join(uploadDir, filename);
+
+      // Convert ArrayBuffer to Buffer and write the file
+      const buffer = Buffer.from(await thumbnailFile.arrayBuffer());
+      await writeFile(filePath, buffer);
+
+      // Set the thumbnailUrl relative to the public directory
+      thumbnailUrl = `/images/${filename}`;
+
+      // Optional: Delete the old image file if it exists and is different
+      // if (existingSite.thumbnailUrl && existingSite.thumbnailUrl !== thumbnailUrl) {
+      //   try {
+      //     const oldFilePath = path.join(process.cwd(), 'public', existingSite.thumbnailUrl);
+      //     await unlink(oldFilePath); // Requires importing unlink from fs/promises
+      //   } catch (unlinkError) {
+      //     console.error(`Failed to delete old thumbnail ${existingSite.thumbnailUrl}:`, unlinkError);
+      //     // Don't block the update if deletion fails
+      //   }
+      // }
+    }
+
     const updatedSite: Site = {
-      ...sites[siteIndex],
-      name: body.name,
-      link: body.link,
-      description: body.description,
-      thumbnailUrl: body.thumbnailUrl,
+      ...existingSite, // Keep existing ID and other potential fields
+      name: name,
+      link: link,
+      description: description,
+      thumbnailUrl: thumbnailUrl, // Use new or existing URL
     };
 
     sites[siteIndex] = updatedSite;
@@ -40,20 +80,16 @@ export async function PUT(request: NextRequest, { params } : { params: Promise<{
   } catch (error) {
     console.error(`API PUT /api/sites/${id} Error:`, error);
 
-    if (error instanceof SyntaxError) {
-      return NextResponse.json({ message: 'Invalid JSON format in request body' }, { status: 400 });
-    }
-
+    // Handle potential errors during file processing or other issues
     return NextResponse.json({ message: 'Failed to update site' }, { status: 500 });
   }
 }
 
 // DELETE /api/sites/[id]
-export async function DELETE(request: NextRequest, { params } : { params: Promise<{ id: string }> }) {
-  const { id } = await params; // Get the ID from the params object
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) { // params is not a Promise here
+  const { id } = params; // Directly access id
 
   if (!id) {
-    // This check might be redundant if Next.js guarantees the param, but good practice
     return NextResponse.json({ message: 'Site ID is required for deletion' }, { status: 400 });
   }
 

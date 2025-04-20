@@ -24,13 +24,12 @@ export async function fetchSites(): Promise<Site[]> {
  * @returns A promise that resolves to the newly created Site object.
  * @throws Will throw an error if the network response is not ok.
  */
-export async function addSite(newSiteData: Omit<Site, 'id'>): Promise<Site> {
+// Update parameter type to FormData and adjust fetch options
+export async function addSite(formData: FormData): Promise<Site> {
   const response = await fetch('/api/sites', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(newSiteData),
+    // Remove 'Content-Type' header; fetch sets it automatically for FormData
+    body: formData,
   });
 
   if (!response.ok) {
@@ -49,13 +48,13 @@ export async function addSite(newSiteData: Omit<Site, 'id'>): Promise<Site> {
  * @returns A promise that resolves to the updated Site object.
  * @throws Will throw an error if the network response is not ok.
  */
-export async function updateSite(id: string, updatedSiteData: Partial<Omit<Site, 'id'>>): Promise<Site> {
+// Update parameter type to FormData and adjust fetch options
+// Note: We'll need to ensure the PUT handler on the API route can handle FormData
+export async function updateSite(id: string, formData: FormData): Promise<Site> {
   const response = await fetch(`/api/sites/${id}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(updatedSiteData),
+    // Remove 'Content-Type' header; fetch sets it automatically for FormData
+    body: formData,
   });
 
   if (!response.ok) {

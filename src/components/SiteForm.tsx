@@ -5,11 +5,12 @@ import { Site } from '@/types';
 import { useTheme } from '../hooks/useTheme';
 
 // Define the shape of the form data, excluding the 'id'
-export type SiteFormData = Omit<Site, 'id'>;
+// Keep SiteFormData for internal state management of text fields
+export type SiteFormData = Omit<Site, 'id' | 'thumbnailUrl'> & { thumbnailUrl?: string };
 
 interface SiteFormProps {
   initialData?: Site | null; // Optional initial data for editing
-  onSubmit: (data: SiteFormData) => void;
+  onSubmit: (data: FormData) => void; // Changed to accept FormData
   onCancel: () => void;
   isSubmitting?: boolean; // Optional flag to disable button during submission
 }
@@ -21,12 +22,17 @@ const SiteForm: React.FC<SiteFormProps> = ({
   isSubmitting = false,
 }) => {
   const { theme } = useTheme();
-  const [formData, setFormData] = useState<SiteFormData>({
+  // State for text fields
+  const [formData, setFormData] = useState<Omit<SiteFormData, 'thumbnailUrl'>>({
     name: '',
     link: '',
     description: '',
-    thumbnailUrl: '',
   });
+  // State for the selected file
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  // State for displaying existing thumbnail URL (when editing)
+  const [existingThumbnailUrl, setExistingThumbnailUrl] = useState<string | undefined>(undefined);
+
   const [cancelHovered, setCancelHovered] = useState(false);
   const [submitHovered, setSubmitHovered] = useState(false);
 
@@ -36,12 +42,15 @@ const SiteForm: React.FC<SiteFormProps> = ({
       setFormData({
         name: initialData.name,
         link: initialData.link,
-        description: initialData.description || '', // Handle potentially undefined description
-        thumbnailUrl: initialData.thumbnailUrl || '', // Handle potentially undefined thumbnailUrl
+        description: initialData.description || '',
       });
+      setExistingThumbnailUrl(initialData.thumbnailUrl); // Set existing URL for display
+      setThumbnailFile(null); // Clear any previously selected file when editing
     } else {
-      // Reset form when switching from edit to add mode (or initial load)
-      setFormData({ name: '', link: '', description: '', thumbnailUrl: '' });
+      // Reset form for adding new site
+      setFormData({ name: '', link: '', description: '' });
+      setExistingThumbnailUrl(undefined);
+      setThumbnailFile(null);
     }
   }, [initialData]); // Re-run effect when initialData changes
 
@@ -53,14 +62,37 @@ const SiteForm: React.FC<SiteFormProps> = ({
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setThumbnailFile(e.target.files[0]);
+      setExistingThumbnailUrl(undefined); // Clear existing URL display if a new file is chosen
+    } else {
+      setThumbnailFile(null);
+      // If clearing the file input, restore the initial URL if editing
+      if (initialData) {
+        setExistingThumbnailUrl(initialData.thumbnailUrl);
+      }
+    }
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission
-    // Basic validation check (can be expanded)
+    e.preventDefault();
     if (!formData.name || !formData.link) {
-      alert('Site Name and Link are required.'); // Simple alert for now
+      alert('Site Name and Link are required.');
       return;
     }
-    onSubmit(formData);
+
+    const submissionData = new FormData();
+    submissionData.append('name', formData.name);
+    submissionData.append('link', formData.link);
+    submissionData.append('description', formData.description);
+    if (thumbnailFile) {
+      submissionData.append('thumbnail', thumbnailFile);
+    }
+    // Note: We don't append thumbnailUrl directly. The backend handles generating
+    // the URL based on the uploaded file or lack thereof.
+
+    onSubmit(submissionData); // Pass the FormData object
   };
 
   // Form container styles
@@ -218,19 +250,27 @@ const SiteForm: React.FC<SiteFormProps> = ({
         />
       </div>
       <div style={fieldContainerStyles}>
-        <label htmlFor="thumbnailUrl" style={labelStyles}>
-          Thumbnail URL
+        <label htmlFor="thumbnail" style={labelStyles}>
+          Thumbnail Image
         </label>
+        {/* Display existing thumbnail if editing and no new file selected */}
+        {existingThumbnailUrl && !thumbnailFile && (
+          <div style={{ marginBottom: '0.5rem', fontSize: '0.8rem', color: theme === 'light' ? '#555' : '#aaa' }}>
+            Current: <a href={existingThumbnailUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#4338ca' }}>{existingThumbnailUrl}</a>
+          </div>
+        )}
         <input
-          type="text"
-          id="thumbnailUrl"
-          name="thumbnailUrl"
-          value={formData.thumbnailUrl}
-          onChange={handleChange}
-          style={inputStyles}
-          placeholder="https://example.com/image.jpg"
+          type="file"
+          id="thumbnail"
+          name="thumbnail"
+          accept="image/*" // Accept only image files
+          onChange={handleFileChange}
+          style={{ ...inputStyles, padding: '0.3rem' }} // Adjust padding for file input
           disabled={isSubmitting}
         />
+         <p style={{ fontSize: '0.75rem', color: theme === 'light' ? '#6b7280' : '#9ca3af', marginTop: '0.25rem' }}>
+           {initialData ? 'Upload a new image to replace the current one.' : 'Upload an image for the site thumbnail.'}
+         </p>
       </div>
 
       {/* Form Actions */}

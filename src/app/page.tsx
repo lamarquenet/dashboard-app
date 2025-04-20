@@ -47,7 +47,8 @@ export default function HomePage() {
     setIsAddModalOpen(false);
   }, []);
 
-  const handleAddSubmit = async (formData: SiteFormData) => {
+  // Update parameter type to FormData
+  const handleAddSubmit = async (formData: FormData) => {
     setIsSubmitting(true);
     setError(null);
     try {
@@ -74,7 +75,8 @@ export default function HomePage() {
     setEditingSite(null);
   }, []);
 
-  const handleEditSubmit = async (formData: SiteFormData) => {
+  // Update parameter type to FormData
+  const handleEditSubmit = async (formData: FormData) => {
     if (!editingSite) return;
 
     setIsSubmitting(true);

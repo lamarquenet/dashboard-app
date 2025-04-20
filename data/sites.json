@@ -54,5 +54,12 @@
     "link": "http://192.168.8.209:8181",
     "description": "Open source service to search the web and provide a service for llm to call when need to search on their querys.",
     "thumbnailUrl": "/images/searxng.jpg"
+  },
+  {
+    "id": "19b9ed02-00dd-4650-89ec-5b196dbcaa5c",
+    "name": "FramePack Video Generation",
+    "link": "http://192.168.8.209:7861",
+    "description": "Video generation for long videos with lowvram.",
+    "thumbnailUrl": "/images/framepack.jpg"
   }
 ]
