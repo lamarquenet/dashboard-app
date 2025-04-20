@@ -17,14 +17,14 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Initialize state on the client side after mount
-  const [theme, setTheme] = useState<Theme>('light'); // Default theme for SSR
+  const [theme, setTheme] = useState<Theme>('dark'); // Default theme for SSR
   const [isClient, setIsClient] = useState(false);
 
   // Effect to set isClient to true after mount and read initial theme
   useEffect(() => {
     setIsClient(true); // Component has mounted on the client
     const storedTheme = localStorage.getItem('theme') as Theme | null;
-    const initialTheme = storedTheme || 'light'; // Use default if nothing stored
+    const initialTheme = storedTheme || 'dark'; // Use default if nothing stored
     setTheme(initialTheme); // Set theme based on localStorage only on client
   }, []); // Empty dependency array ensures this runs once after mount
 
@@ -45,7 +45,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Determine the theme value for the provider:
   // Use the state theme *only if* we are on the client, otherwise use the SSR default.
   // This ensures the initial client render matches the server render.
-  const providerValueTheme = isClient ? theme : 'light';
+  const providerValueTheme = isClient ? theme : 'dark';
 
   return (
     <ThemeContext.Provider value={{ theme: providerValueTheme, toggleTheme }}>
