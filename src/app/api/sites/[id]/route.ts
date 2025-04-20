@@ -5,8 +5,8 @@ import { writeFile, mkdir } from 'fs/promises'; // Import fs/promises for async 
 import path from 'path'; // Import path for handling file paths
 
 // PUT /api/sites/[id]
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) { // params is not a Promise here
-  const { id } = params; // Directly access id
+export async function PUT(request: NextRequest, { params } : { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ message: 'Site ID is required for update' }, { status: 400 });
@@ -86,8 +86,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE /api/sites/[id]
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) { // params is not a Promise here
-  const { id } = params; // Directly access id
+export async function DELETE(request: NextRequest, { params } : { params: Promise<{ id: string }> }) {
+  const { id } = await params; // Get the ID from the params object
 
   if (!id) {
     return NextResponse.json({ message: 'Site ID is required for deletion' }, { status: 400 });

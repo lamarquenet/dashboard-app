@@ -5,7 +5,7 @@ import { Site } from '@/types';
 import { fetchSites, addSite, updateSite, deleteSite } from '@/lib/services/siteService';
 import SiteCard from '@/components/SiteCard';
 import Modal from '@/components/Modal';
-import SiteForm, { SiteFormData } from '@/components/SiteForm';
+import SiteForm from '@/components/SiteForm'; // Removed unused SiteFormData import
 import { useTheme } from '../hooks/useTheme';
 
 export default function HomePage() {
