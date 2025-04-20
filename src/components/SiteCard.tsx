@@ -37,7 +37,7 @@ const SiteCard: React.FC<SiteCardProps> = ({ site, onEdit, onDelete }) => {
     borderRadius: '0.5rem', // rounded-lg
     borderWidth: '1px',
     borderStyle: 'solid' as const,
-    borderColor: theme === 'light' ? '#e5e7eb' : '#4b5563', // border-gray-200 : dark:border-gray-700
+    borderColor: theme === 'light' ? '#111827' : '#4b5563', // border-gray-200 : dark:border-gray-700
     backgroundColor: theme === 'light' ? '#ffffff' : '#1f2937', // bg-white : dark:bg-gray-800
     boxShadow: isHovered
       ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' // hover:shadow-md

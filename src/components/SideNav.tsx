@@ -59,7 +59,7 @@ export function SideNav() {
     gap: '0.5rem', // space-y-2
     borderRightWidth: '1px',
     borderRightStyle: 'solid' as const, // Explicitly type as const to satisfy TypeScript
-    borderRightColor: theme === 'light' ? '#e5e7eb' : '#4b5563', // border-gray-200 : dark:border-gray-700
+    borderRightColor: theme === 'light' ? '#111827' : '#4b5563', // border-gray-200 : dark:border-gray-700
     backgroundColor: theme === 'light' ? '#ffffff' : '#111827', // bg-white : dark:bg-gray-900
   };
 
