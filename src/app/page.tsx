@@ -115,7 +115,7 @@ export default function HomePage() {
 
   // Container styles
   const containerStyles = {
-    padding: '1rem', // p-4
+    padding: '0.25rem', // p-4
     // Media queries aren't supported in React inline styles
     // Using fixed padding instead
   };
@@ -124,14 +124,14 @@ export default function HomePage() {
   const headingStyles = {
     fontSize: '1.5rem', // text-2xl
     fontWeight: 'bold',
-    marginBottom: '1.5rem', // mb-6
+    marginBottom: '0.25rem', // mb-6
     color: theme === 'light' ? '#111827' : '#ffffff', // text-gray-900 dark:text-white
     // Media queries aren't supported in React inline styles
   };
 
   // Button container styles
   const buttonContainerStyles = {
-    marginBottom: '1.5rem', // mb-6
+    marginBottom: '1rem', // mb-6
     display: 'flex',
     justifyContent: 'flex-end', // justify-end
   };
@@ -195,7 +195,7 @@ export default function HomePage() {
     gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', // Responsive grid with minimum card width of 250px
     gap: '1rem', // gap-4
     width: '100%',
-    maxWidth: '1200px', // Limit maximum width to prevent too wide cards on large screens
+    maxWidth: '100%', // Limit maximum width to prevent too wide cards on large screens
     margin: '0 auto', // Center the grid
   };
 
