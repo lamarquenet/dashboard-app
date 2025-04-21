@@ -87,8 +87,8 @@ export function SideNav() {
         >
           Sites
         </Link>
-        <Link 
-          href="/chat" 
+        <Link
+          href="/chat"
           style={getLinkStyles('/chat')}
           onMouseOver={() => setHoveredLink('/chat')}
           onMouseOut={() => setHoveredLink(null)}
