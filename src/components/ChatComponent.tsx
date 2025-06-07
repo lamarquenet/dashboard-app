@@ -9,7 +9,7 @@ interface OllamaModel {
   size: number;
 }
 
-const ChatComponent: React.FC<{}> = () => {
+const ChatComponent: React.FC = () => {
   const { theme } = useTheme();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<string[]>([]);
@@ -167,7 +167,7 @@ const ChatComponent: React.FC<{}> = () => {
     setIsStreaming(true); // Start streaming state
     const userMessage = `You: ${message}`;
     const ollamaPlaceholder = 'Ollama: ';
-    setMessages((prevMessages) => [...prevMessages, userMessage, ollamaPlaceholder]);
+    setMessages((prevMessages: string[]) => [...prevMessages, userMessage, ollamaPlaceholder]);
     setMessage(''); // Clear input immediately
     setImageFile(null); // Clear image immediately
 
@@ -192,7 +192,7 @@ const ChatComponent: React.FC<{}> = () => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error response from API:', response.status, errorText);
-        setMessages((prevMessages) => {
+        setMessages((prevMessages: string[]) => {
           const newMessages = [...prevMessages];
           newMessages[newMessages.length - 1] = `Ollama: Error - ${response.statusText} (${response.status})`;
           return newMessages;
@@ -218,7 +218,7 @@ const ChatComponent: React.FC<{}> = () => {
         leftover += decodedChunk; // Add new chunk to leftover buffer
 
         // Process lines separated by newline
-        let lines = leftover.split('\n');
+        const lines = leftover.split('\n');
 
         // Keep the last potentially incomplete line in the buffer
         leftover = lines.pop() || '';
@@ -229,7 +229,7 @@ const ChatComponent: React.FC<{}> = () => {
             const parsed = JSON.parse(line);
             if (parsed.message?.content) {
               accumulatedResponse += parsed.message.content;
-              setMessages((prevMessages) => {
+              setMessages((prevMessages: string[]) => {
                 const newMessages = [...prevMessages];
                 newMessages[newMessages.length - 1] = `Ollama: ${accumulatedResponse}`;
                 return newMessages;
@@ -237,7 +237,7 @@ const ChatComponent: React.FC<{}> = () => {
             }
              if (parsed.error) {
                console.error("Ollama stream error:", parsed.error);
-               setMessages((prevMessages) => {
+               setMessages((prevMessages: string[]) => {
                  const newMessages = [...prevMessages];
                  newMessages[newMessages.length - 1] = `Ollama: Error - ${parsed.error}`;
                  return newMessages;
@@ -261,7 +261,7 @@ const ChatComponent: React.FC<{}> = () => {
                const parsed = JSON.parse(leftover);
                if (parsed.message?.content) {
                    accumulatedResponse += parsed.message.content;
-                   setMessages((prevMessages) => {
+                   setMessages((prevMessages: string[]) => {
                        const newMessages = [...prevMessages];
                        newMessages[newMessages.length - 1] = `Ollama: ${accumulatedResponse}`;
                        return newMessages;
@@ -269,7 +269,7 @@ const ChatComponent: React.FC<{}> = () => {
                }
                if (parsed.error) {
                  console.error("Ollama stream error (final chunk):", parsed.error);
-                 setMessages((prevMessages) => {
+                 setMessages((prevMessages: string[]) => {
                    const newMessages = [...prevMessages];
                    newMessages[newMessages.length - 1] = `Ollama: Error - ${parsed.error}`;
                    return newMessages;
@@ -283,7 +283,7 @@ const ChatComponent: React.FC<{}> = () => {
 
     } catch (error) {
       console.error('Error handling stream:', error);
-      setMessages((prevMessages) => {
+      setMessages((prevMessages: string[]) => {
         const newMessages = [...prevMessages];
         // Update the placeholder message with the error
         newMessages[newMessages.length - 1] = `Ollama: Error processing stream - ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -334,7 +334,7 @@ const ChatComponent: React.FC<{}> = () => {
             {!isLoadingModels && availableModels.length === 0 && (
               <option value={model}>{model} (default)</option>
             )}
-            {!isLoadingModels && availableModels.length > 0 && availableModels.map((m) => (
+            {!isLoadingModels && availableModels.length > 0 && availableModels.map((m: OllamaModel) => (
               <option key={m.name} value={m.name}>
                 {m.name} ({m.size ? (m.size / 1e9).toFixed(2) + ' GB' : 'size unknown'})
               </option>
@@ -361,7 +361,7 @@ const ChatComponent: React.FC<{}> = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {messages.map((msg, index) => {
+            {messages.map((msg: string, index: number) => {
               const isUser = msg.startsWith('You:');
               const content = isUser ? msg.substring(5) : msg.substring(8); // Remove "You: " or "Ollama: "
               
@@ -390,14 +390,14 @@ const ChatComponent: React.FC<{}> = () => {
         <div style={textAreaContainerStyles}>
           <textarea
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
             placeholder="Type your message..."
             style={theme === 'dark' ? darkTextAreaStyles : textAreaStyles}
             disabled={isStreaming || isLoadingModels || !!errorLoadingModels}
-            onKeyDown={(e) => {
+            onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleSendMessage(e as any);
+                handleSendMessage(e as unknown as React.FormEvent);
               }
             }}
           />
@@ -434,13 +434,13 @@ const ChatComponent: React.FC<{}> = () => {
           type="submit"
           disabled={isStreaming || !message || isLoadingModels || !!errorLoadingModels}
           style={isStreaming || !message || isLoadingModels || !!errorLoadingModels ? disabledSendButtonStyles : sendButtonStyles}
-          onMouseOver={(e) => {
+          onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
             if (!(isStreaming || !message || isLoadingModels || !!errorLoadingModels)) {
               e.currentTarget.style.backgroundColor = hoverSendButtonStyles.backgroundColor;
               e.currentTarget.style.boxShadow = hoverSendButtonStyles.boxShadow;
             }
           }}
-          onMouseOut={(e) => {
+          onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
             if (!(isStreaming || !message || isLoadingModels || !!errorLoadingModels)) {
               e.currentTarget.style.backgroundColor = sendButtonStyles.backgroundColor;
               e.currentTarget.style.boxShadow = sendButtonStyles.boxShadow;

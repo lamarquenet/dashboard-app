@@ -61,5 +61,12 @@
     "link": "http://192.168.8.209:7861",
     "description": "Video generation for long videos with lowvram.",
     "thumbnailUrl": "/images/framepack.jpg"
+  },
+  {
+    "id": "4fad6e2c-aed7-40e5-b762-bebcea42a51a",
+    "name": "Portainer",
+    "link": "https://192.168.8.209:9443",
+    "description": "portainer is a webUI to display the running containers on your machine and easily manage them.",
+    "thumbnailUrl": "/images/portainer.jpg"
   }
 ]
